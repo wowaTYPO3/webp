@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Plan2net\Webp\EventListener;
 
-use Exception;
 use Plan2net\Webp\Converter\Exception\ConvertedFileLargerThanOriginalException;
 use Plan2net\Webp\Converter\Exception\WillNotRetryWithConfigurationException;
 use Plan2net\Webp\Service\Configuration;
@@ -16,14 +15,7 @@ use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Resource\ProcessedFileRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function sprintf;
-use function strpos;
 
-/**
- * Class AfterFileProcessing
- *
- * @author Wolfgang Klinger <wk@plan2.net>
- */
 class AfterFileProcessing
 {
     public function __invoke(AfterFileProcessingEvent $event): void
@@ -37,7 +29,7 @@ class AfterFileProcessing
     }
 
     /**
-     * Process a file using the configured adapter to create a webp copy
+     * Process a file using the configured adapter to create a webp copy.
      *
      * @param FileInterface|File $file
      */
@@ -65,7 +57,7 @@ class AfterFileProcessing
                 $file,
                 $taskType,
                 $configuration + [
-                    'webp' => true
+                    'webp' => true,
                 ]
             );
             // Check if reprocessing is required
@@ -86,9 +78,9 @@ class AfterFileProcessing
             } catch (ConvertedFileLargerThanOriginalException $e) {
                 $logger->warning($e->getMessage());
                 $this->removeProcessedFile($processedFileWebp);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $logger->error(
-                    sprintf(
+                    \sprintf(
                         'Failed to convert image "%s" to webp with: %s',
                         $processedFile->getIdentifier(),
                         $e->getMessage()
@@ -125,9 +117,9 @@ class AfterFileProcessing
 
     protected function needsReprocessing(ProcessedFile $processedFile): bool
     {
-        return $processedFile->isNew() ||
-            (!$processedFile->usesOriginalFile() && !$processedFile->exists()) ||
-            $processedFile->isOutdated();
+        return $processedFile->isNew()
+            || (!$processedFile->usesOriginalFile() && !$processedFile->exists())
+            || $processedFile->isOutdated();
     }
 
     protected function isFileInProcessingFolder(ProcessedFile $file): bool
@@ -142,7 +134,7 @@ class AfterFileProcessing
             return false;
         }
 
-        return 0 === strpos($file->getIdentifier(), $processingFolder->getIdentifier());
+        return 0 === \strpos($file->getIdentifier(), $processingFolder->getIdentifier());
     }
 
     protected function isStorageLocalAndWritable(ProcessedFile $file): bool
@@ -161,9 +153,9 @@ class AfterFileProcessing
     {
         try {
             $processedFile->delete(true);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
-            $logger->error(sprintf('Failed to remove processed file "%s": %s',
+            $logger->error(\sprintf('Failed to remove processed file "%s": %s',
                 $processedFile->getIdentifier(),
                 $e->getMessage()
             ));

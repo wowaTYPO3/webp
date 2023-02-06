@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Plan2net\Webp\Converter;
 
-/**
- * Class AbstractConverter
- *
- * @author Wolfgang Klinger <wk@plan2.net>
- */
 abstract class AbstractConverter implements Converter
 {
     /**
